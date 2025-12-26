@@ -1,12 +1,11 @@
 let currentVariation = null;
 let currentConfig = null;
 let saveTimeout = null;
+let sharedState = {};
 
-// Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     await loadVariations();
     setupDownloadButton();
-    // Auto-select variation1
     const variations = await fetch('/api/variations').then(r => r.json());
     if (variations.length > 0) {
         await loadVariation(variations[0]);
@@ -35,9 +34,12 @@ async function loadVariations() {
 }
 
 async function loadVariation(variationName) {
+    if (currentConfig) {
+        mergeIntoSharedState(currentConfig);
+    }
+    
     currentVariation = variationName;
     
-    // Update active button
     document.querySelectorAll('.variation-btn').forEach(btn => {
         if (btn.dataset.variation === variationName) {
             btn.classList.add('active');
@@ -46,10 +48,12 @@ async function loadVariation(variationName) {
         }
     });
     
-    // Load config
     try {
         const response = await fetch(`/api/config/${variationName}`);
         currentConfig = await response.json();
+        
+        mergeSharedStateIntoConfig(currentConfig);
+        
         renderConfigEditor(currentConfig);
     } catch (error) {
         console.error('Failed to load config:', error);
@@ -57,9 +61,56 @@ async function loadVariation(variationName) {
             '<p class="placeholder">Failed to load configuration</p>';
     }
     
-    // Load preview
     const previewFrame = document.getElementById('preview-frame');
     previewFrame.src = `/variation/${variationName}/index.html`;
+}
+
+function mergeIntoSharedState(config) {
+    Object.keys(config).forEach(key => {
+        const value = config[key];
+        const type = getValueType(value);
+        
+        if (!sharedState[key] || sharedState[key].type === type) {
+            sharedState[key] = { value, type };
+        }
+    });
+}
+
+function mergeSharedStateIntoConfig(config) {
+    Object.keys(sharedState).forEach(key => {
+        if (!config.hasOwnProperty(key)) {
+            const stored = sharedState[key];
+            const configType = getConfigType(config);
+            
+            if (shouldMergeKey(key, stored.type, configType)) {
+                config[key] = stored.value;
+            }
+        }
+    });
+}
+
+function getValueType(value) {
+    if (Array.isArray(value)) {
+        if (value.length === 0) return 'array-empty';
+        if (typeof value[0] === 'string') return 'array-string';
+        if (typeof value[0] === 'object') return 'array-object';
+        return 'array';
+    }
+    if (typeof value === 'string' && isDateString(value)) return 'date';
+    if (typeof value === 'string' && /^#[0-9A-Fa-f]{6}$/.test(value)) return 'color';
+    return typeof value;
+}
+
+function getConfigType(config) {
+    if (config.socials) return 'with-socials';
+    if (config.roleTitle) return 'with-roleTitle';
+    return 'basic';
+}
+
+function shouldMergeKey(key, storedType, configType) {
+    if (key === 'roleTitle') return true;
+    if (key === 'socials') return true;
+    return true;
 }
 
 function setupDownloadButton() {
