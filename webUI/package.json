@@ -1,0 +1,15 @@
+{
+    "name": "portfolio-webui",
+    "version": "1.0.0",
+    "main": "server.js",
+    "dependencies": {
+        "archiver": "^6.0.1",
+        "express": "^4.18.2"
+    },
+    "description": "Web UI for managing portfolio variations",
+    "scripts": {
+        "start": "bun run server.js",
+        "dev": "bun run --watch server.js"
+    },
+    "type": "module"
+}

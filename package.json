@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-multi-entry": "^7.1.0",
+    "@rollup/plugin-replace": "^6.0.3",
+    "@web/rollup-plugin-html": "^2.4.1"
+  }
+}

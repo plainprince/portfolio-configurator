@@ -1,0 +1,311 @@
+:root {
+    /* Night Owl Palette */
+    --bg-color: #000000;
+    --bg-card: #011627;
+    --bg-darker: #000c1d;
+    
+    --text-primary: #d6deeb;
+    --text-secondary: #8b9eb5;
+    
+    --accent-cyan: #7fdbca;
+    --accent-blue: #82AAFF;
+    --accent-magenta: #c792ea;
+    --accent-yellow: #ecc48d;
+    --accent-green: #21c7a8;
+    
+    --border-color: #5f7e97;
+    
+    --font-mono: 'Courier New', Courier, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    
+    --transition-fast: 0.2s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.header {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-md);
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.variation-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    min-width: max-content;
+}
+
+.variation-btn {
+    background-color: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.variation-btn:hover {
+    border-color: var(--accent-blue);
+    background-color: rgba(130, 170, 255, 0.1);
+}
+
+.variation-btn.active {
+    background-color: var(--accent-blue);
+    color: var(--bg-color);
+    border-color: var(--accent-blue);
+}
+
+.download-btn {
+    background-color: var(--accent-green);
+    border: none;
+    color: var(--bg-color);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.download-btn:hover {
+    opacity: 0.9;
+}
+
+.download-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Main Content */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Preview Panel */
+.preview-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-darker);
+    border-right: 1px solid var(--border-color);
+}
+
+.preview-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+#preview-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: var(--bg-color);
+    display: block;
+}
+
+/* Config Panel */
+.config-panel {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-card);
+    overflow: hidden;
+}
+
+.config-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.placeholder {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    font-style: italic;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    background-color: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    transition: border-color var(--transition-fast);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: none;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+.form-array-item {
+    background-color: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.form-array-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.array-item-title {
+    color: var(--accent-cyan);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.array-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.form-input[type="color"] {
+    height: 40px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.btn-remove {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all var(--transition-fast);
+}
+
+.btn-remove:hover {
+    border-color: var(--accent-magenta);
+    color: var(--accent-magenta);
+}
+
+.btn-add {
+    background-color: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    color: var(--accent-green);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+    width: 100%;
+    margin-top: var(--spacing-xs);
+}
+
+.btn-add:hover {
+    border-color: var(--accent-green);
+    background-color: rgba(33, 199, 168, 0.1);
+}
+
+.save-btn {
+    background-color: var(--accent-blue);
+    border: none;
+    color: var(--bg-color);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: opacity var(--transition-fast);
+}
+
+.save-btn:hover {
+    opacity: 0.9;
+}
+
+.save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Scrollbar Styling */
+.config-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.config-content::-webkit-scrollbar-track {
+    background: var(--bg-darker);
+}
+
+.config-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.config-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}
+
