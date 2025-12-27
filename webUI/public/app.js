@@ -135,7 +135,6 @@ function setupDownloadButton() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            // Extract filename from Content-Disposition header, or use variation name
             const contentDisposition = response.headers.get('Content-Disposition');
             let filename = `${currentVariation}.html`;
             if (contentDisposition) {
@@ -161,7 +160,6 @@ function setupDownloadButton() {
 
 function isDateString(str) {
     if (typeof str !== 'string') return false;
-    // Check for common date formats: DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, etc.
     const datePatterns = [
         /^\d{2}\.\d{2}\.\d{4}$/,  // DD.MM.YYYY
         /^\d{4}-\d{2}-\d{2}$/,     // YYYY-MM-DD
@@ -172,16 +170,13 @@ function isDateString(str) {
 }
 
 function parseDateToInput(str) {
-    // Convert DD.MM.YYYY to YYYY-MM-DD
     if (/^\d{2}\.\d{2}\.\d{4}$/.test(str)) {
         const [day, month, year] = str.split('.');
         return `${year}-${month}-${day}`;
     }
-    // Already in YYYY-MM-DD format
     if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
         return str;
     }
-    // Try to parse and convert
     const date = new Date(str);
     if (!isNaN(date.getTime())) {
         return date.toISOString().split('T')[0];
@@ -190,7 +185,6 @@ function parseDateToInput(str) {
 }
 
 function formatDateFromInput(str) {
-    // Convert YYYY-MM-DD back to DD.MM.YYYY if original was in that format
     if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
         const [year, month, day] = str.split('-');
         return `${day}.${month}.${year}`;
@@ -202,7 +196,6 @@ function renderConfigEditor(config) {
     const editor = document.getElementById('config-editor');
     editor.innerHTML = '';
     
-    // Render each field
     Object.keys(config).forEach(key => {
         const value = config[key];
         
@@ -276,9 +269,7 @@ function renderArrayField(container, key, array, config) {
     label.textContent = `${key} (${array.length} items):`;
     group.appendChild(label);
     
-    // Check if it's an array of strings or objects
     if (array.length > 0 && typeof array[0] === 'object') {
-        // Array of objects (e.g., skills)
         array.forEach((item, index) => {
             const itemDiv = renderObjectArrayItem(container, key, item, index, config);
             group.appendChild(itemDiv);
@@ -295,7 +286,6 @@ function renderArrayField(container, key, array, config) {
         });
         group.appendChild(addBtn);
     } else {
-        // Array of strings (e.g., aboutMe)
         array.forEach((item, index) => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'form-array-item';
@@ -370,7 +360,6 @@ function renderObjectArrayItem(container, key, item, index, config) {
     header.appendChild(removeBtn);
     itemDiv.appendChild(header);
     
-    // Render object fields
     Object.keys(item).forEach(subKey => {
         const subGroup = document.createElement('div');
         subGroup.style.marginBottom = '0.5rem';
@@ -453,12 +442,10 @@ function autoSave() {
         return;
     }
     
-    // Clear existing timeout
     if (saveTimeout) {
         clearTimeout(saveTimeout);
     }
     
-    // Set new timeout to save after 500ms of no changes
     saveTimeout = setTimeout(async () => {
         try {
             const response = await fetch(`/api/config/${currentVariation}`, {
@@ -470,7 +457,6 @@ function autoSave() {
             });
             
             if (response.ok) {
-                // Reload preview to show changes
                 const previewFrame = document.getElementById('preview-frame');
                 previewFrame.src = previewFrame.src;
             }
