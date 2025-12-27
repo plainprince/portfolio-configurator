@@ -1,9 +1,8 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve, extname } from 'path';
-import { readdir, stat, readFile, writeFile, rm, mkdtemp, cp } from 'fs/promises';
-import { tmpdir } from 'os';
-import archiver from 'archiver';
+import { readdir, stat, readFile, writeFile } from 'fs/promises';
+import { bundleVariation, readBundledHTML, cleanupBundle } from './bundler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,21 +11,6 @@ const PORT = 3000;
 
 // Get parent directory (portfolio-page root)
 const parentDir = resolve(__dirname, '..');
-
-async function bundleVariation(variationName) {
-    const variationPath = join(parentDir, variationName);
-    const tempDir = await mkdtemp(join(tmpdir(), 'portfolio-source-'));
-    
-    console.log(`[ZIP] Preparing source files for ${variationName}`);
-    
-    try {
-        await cp(variationPath, tempDir, { recursive: true });
-        return tempDir;
-    } catch (error) {
-        console.error(`[ZIP] Error preparing source:`, error);
-        throw error;
-    }
-}
 
 // Middleware
 app.use(express.json());
@@ -99,61 +83,41 @@ app.post('/api/config/:variationName', async (req, res) => {
     }
 });
 
-// API endpoint to zip and download variation
+// API endpoint to download bundled variation as single HTML file
 app.get('/api/download/:variationName', async (req, res) => {
     const { variationName } = req.params;
-    console.log(`[ZIP] Starting zip process for: ${variationName}`);
+    console.log(`[DOWNLOAD] Starting download for: ${variationName}`);
     
-    let buildDir = null;
+    let bundlePath = null;
     
     try {
-        // Build variation
-        buildDir = await bundleVariation(variationName);
+        // Bundle variation into single HTML file
+        bundlePath = await bundleVariation(variationName);
         
-        // Set response headers for zip download
-        res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', 'attachment; filename="portfolio.zip"');
+        // Read the bundled HTML
+        const htmlContent = await readBundledHTML(bundlePath);
         
-        // Create archiver instance
-        const archive = archiver('zip', {
-            zlib: { level: 9 } // Maximum compression
-        });
+        // Set response headers for HTML download
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${variationName}.html"`);
         
-        // Handle archive errors
-        archive.on('error', (err) => {
-            console.error(`[ZIP] Archive error for ${variationName}:`, err);
-            if (!res.headersSent) {
-                res.status(500).json({ error: 'Failed to create zip archive', details: err.message });
-            }
-        });
+        // Send the HTML content
+        res.send(htmlContent);
         
-        // Pipe archive data to response
-        archive.pipe(res);
-        
-        // Add built variation directory to archive
-        archive.glob('**/*', {
-            cwd: buildDir,
-            ignore: ['.git/**']
-        });
-        
-        // Finalize the archive
-        await archive.finalize();
-        
-        console.log(`[ZIP] Zip process completed successfully for: ${variationName}`);
+        console.log(`[DOWNLOAD] Successfully sent ${variationName}.html`);
         
     } catch (error) {
-        console.error(`[ZIP] Zip error for ${variationName}:`, error);
+        console.error(`[DOWNLOAD] Error for ${variationName}:`, error);
         if (!res.headersSent) {
-            res.status(500).json({ error: 'Failed to create zip archive', details: error.message });
+            res.status(500).json({ error: 'Failed to bundle variation', details: error.message });
         }
     } finally {
-        // Cleanup build folder
-        if (buildDir) {
+        // Cleanup bundle
+        if (bundlePath) {
             try {
-                await rm(buildDir, { recursive: true, force: true });
-                console.log(`[ZIP] Cleaned up build folder: ${buildDir}`);
+                await cleanupBundle(bundlePath);
             } catch (error) {
-                console.error(`[ZIP] Failed to cleanup build folder:`, error);
+                console.error(`[DOWNLOAD] Failed to cleanup bundle:`, error);
             }
         }
     }

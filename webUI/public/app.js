@@ -122,7 +122,7 @@ function setupDownloadButton() {
         }
         
         downloadBtn.disabled = true;
-        downloadBtn.textContent = 'Zipping...';
+        downloadBtn.textContent = 'Bundling...';
         
         try {
             const response = await fetch(`/api/download/${currentVariation}`);
@@ -145,7 +145,7 @@ function setupDownloadButton() {
             alert(`Failed to download portfolio: ${error.message}`);
         } finally {
             downloadBtn.disabled = false;
-            downloadBtn.textContent = 'Download ZIP';
+            downloadBtn.textContent = 'Download HTML';
         }
     });
 }
