@@ -48,7 +48,7 @@ app.get('/api/variations', async (req, res) => {
     try {
         const entries = await readdir(parentDir, { withFileTypes: true });
         const variations = entries
-            .filter(entry => entry.isDirectory() && entry.name.startsWith('variation'))
+            .filter(entry => entry.isDirectory() && /^variation\d+$/.test(entry.name))
             .map(entry => entry.name)
             .sort();
         res.json(variations);
